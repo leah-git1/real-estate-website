@@ -1,0 +1,51 @@
+<div class="chat-container">
+
+  <button class="chat-toggle" (click)="isOpen = !isOpen" [class.open]="isOpen">
+    <i [class]="isOpen ? 'pi pi-times' : 'pi pi-comments'"></i>
+  </button>
+
+  <div class="chat-window" [class.open]="isOpen">
+
+    <div class="chat-header">
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-comments"></i>
+        <div>
+          <h3>עוזר AI</h3>
+          <span class="status">מקוון</span>
+        </div>
+      </div>
+      <button class="close-btn" (click)="isOpen = false">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="chat-messages" (click)="handleClick($event)">
+      @for (m of messages; track $index) {
+        <div [class]="'message ' + m.role">
+          <div class="message-content" [innerHTML]="renderMarkdown(m.content)"></div>
+          <span class="timestamp">{{ m.timestamp | date:'HH:mm' }}</span>
+        </div>
+      }
+      @if (loading) {
+        <div class="message assistant">
+          <div class="message-content typing-indicator">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+      @if (error) {
+        <div class="message error">
+          <div class="message-content">⚠️ {{ error }}</div>
+        </div>
+      }
+    </div>
+
+    <div class="chat-input">
+      <textarea [(ngModel)]="input" (keydown)="onKey($event)" placeholder="שאל אותי על הנכסים..."></textarea>
+      <button (click)="send()" [disabled]="loading">
+        <i class="pi pi-send"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
