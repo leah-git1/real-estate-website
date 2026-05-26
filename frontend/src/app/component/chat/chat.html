@@ -42,6 +42,9 @@
 
     <div class="chat-input">
       <textarea [(ngModel)]="input" (keydown)="onKey($event)" placeholder="שאל אותי על הנכסים..."></textarea>
+      @if (voiceSupported) {
+        <app-voice-search [chatMode]="true" (transcriptReady)="onVoiceTranscript($event)"></app-voice-search>
+      }
       <button (click)="send()" [disabled]="loading">
         <i class="pi pi-send"></i>
       </button>

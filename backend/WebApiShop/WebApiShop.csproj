@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Services\Services.csproj" />
+    <ProjectReference Include="..\AI_SERVICE\AI_SERVICE.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -31,6 +31,8 @@ builder.Services.AddScoped<IPropertyInquiryService, PropertyInquiryService>();
 builder.Services.AddScoped<IPropertyInquiryRepository, PropertyInquiryRepository>();
 builder.Services.AddScoped<IAdminInquiryRepository, AdminInquiryRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHttpClient("ai_service", c =>
+    c.BaseAddress = new Uri(builder.Configuration["AiService:BaseUrl"] ?? "http://localhost:8000"));
 
 
 builder.Host.UseNLog();

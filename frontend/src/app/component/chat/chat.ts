@@ -1,25 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChatService } from '../../services/chat_service';
+import { VoiceSearchComponent } from '../voice-search/voice-search.component';
+import { ChatStateService } from '../../services/chat-state.service';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, VoiceSearchComponent],
   templateUrl: './chat.html',
   styleUrls: ['./chat.scss']
 })
 export class ChatComponent {
   messages: {role: string; content: string; timestamp: Date}[] = [];
   input = '';
+  voiceSupported = !!(window as any).SpeechRecognition || !!(window as any).webkitSpeechRecognition;
   loading = false;
   isOpen = false;
   error = '';
 
-  constructor(private chatService: ChatService, private router: Router, private sanitizer: DomSanitizer) {}
+  constructor(private chatService: ChatService, private router: Router, private sanitizer: DomSanitizer, private chatState: ChatStateService) {
+    effect(() => {
+      if (this.chatState.isOpen()) this.isOpen = true;
+      const msg = this.chatState.prefill();
+      if (msg) { this.input = msg; this.chatState.prefill.set(''); }
+    });
+  }
 
   send() {
     if (!this.input.trim() || this.loading) return;
@@ -58,6 +67,11 @@ export class ChatComponent {
       })
       .replace(/\n/g, '<br>');
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  onVoiceTranscript(text: string) {
+    this.input = text;
+    this.send();
   }
 
   handleClick(e: MouseEvent) {
