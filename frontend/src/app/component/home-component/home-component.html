@@ -223,6 +223,43 @@
     </div>
   </section>
 
+  <!-- AI Appraisal CTA Card -->
+  <section class="ai-appraisal-section" @fadeInUp>
+    <div class="container">
+      <div class="ai-appraisal-card">
+        <div class="ai-appraisal-content">
+          <div class="ai-badge">✨ חדש — בינה מלאכותית</div>
+          <h2>הערכת שווי נכס חכמה</h2>
+          <p>העלה תמונות של הנכס שלך וקבל הערכת שווי מדויקת תוך שניות,
+             מבוססת על ניתוח ויזואלי ונתוני שוק עדכניים.</p>
+          <ul class="ai-features">
+            <li><span class="check">✅</span> ניתוח מטבח, תאורה ושיפוצים</li>
+            <li><span class="check">✅</span> טווח מחיר ורמת ביטחון</li>
+            <li><span class="check">✅</span> תוצאות תוך 30 שניות</li>
+          </ul>
+          <button pButton label="קבל הערכת שווי חינם" icon="pi pi-sparkles"
+                  class="p-button-lg ai-appraisal-btn" (click)="goToValuation()"></button>
+        </div>
+        <div class="ai-appraisal-visual">
+          <div class="appraisal-mockup">
+            <div class="mockup-header">🏠 הערכת שווי AI</div>
+            <div class="mockup-price">₪ 2,450,000</div>
+            <div class="mockup-range">טווח: 2.25M — 2.65M ₪</div>
+            <div class="mockup-bar">
+              <div class="mockup-bar-fill" style="width: 82%"></div>
+            </div>
+            <div class="mockup-confidence">ביטחון: 82%</div>
+            <div class="mockup-tags">
+              <span>🍳 מטבח מודרני</span>
+              <span>💡 תאורה טובה</span>
+              <span>🔨 שופץ לאחרונה</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Section -->
   <section class="cta-section" @fadeInUp>
     <div class="container text-center">

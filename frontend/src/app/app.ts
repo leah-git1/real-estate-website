@@ -6,12 +6,13 @@ import { CartSidebarComponent } from './component/cart-sidebar/cart-sidebar.comp
 import { FavoritesSidebarComponent } from './component/favorites-sidebar/favorites-sidebar.component';
 import { FooterComponent } from './component/footer-component/footer-component';
 import { ChatComponent } from './component/chat/chat';
+import { ValuationBtnComponent } from './component/valuation-btn/valuation-btn.component';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ToastModule, HeaderComponent, CartSidebarComponent, FavoritesSidebarComponent, FooterComponent, ChatComponent],
+  imports: [RouterOutlet, ToastModule, HeaderComponent, CartSidebarComponent, FavoritesSidebarComponent, FooterComponent, ChatComponent, ValuationBtnComponent],
   templateUrl: './app.html'
 })
 export class AppComponent implements OnInit {

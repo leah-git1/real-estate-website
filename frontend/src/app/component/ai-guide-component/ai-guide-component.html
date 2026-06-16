@@ -3,21 +3,21 @@
   <!-- Hero -->
   <section class="guide-hero">
     <div class="hero-content">
-      <div class="maggie-avatar">🏡</div>
-      <h1>היכרות עם מגי</h1>
-      <p>העוזרת החכמה שלך לחיפוש נכסים — בטקסט או בקול</p>
+      <div class="maggie-avatar">🤖</div>
+      <h1>הסוכן החכם שלך</h1>
+      <p>AI מתקדם לחיפוש נכסים, שאלות, והערכת שווי — בטקסט או בקול</p>
       <button class="hero-btn" (click)="openChat()">
         <i class="pi pi-comments"></i> פתח את הצ'אט עכשיו
       </button>
     </div>
   </section>
 
-  <!-- What is Maggie -->
+  <!-- What is the Smart Agent -->
   <section class="section">
     <div class="container">
       <div class="section-title-wrap">
-        <h2>מה זה מגי? 🤖</h2>
-        <p>מגי היא עוזרת AI שמחוברת לכל הנכסים באתר בזמן אמת. היא יכולה לעזור לך למצוא נכסים, לענות על שאלות, ולשלוח אותך ישירות לנכס המתאים.</p>
+        <h2>מה זה הסוכן החכם? 🤖</h2>
+        <p>הסוכן החכם הוא עוזר AI שמחובר לכל הנכסים באתר בזמן אמת. הוא יכול לעזור לך למצוא נכסים, לענות על שאלות, ולשלוח אותך ישירות לנכס המתאים.</p>
       </div>
 
       <div class="cards-grid">
@@ -34,19 +34,44 @@
         <div class="feature-card">
           <div class="card-icon">🎤</div>
           <h3>חיפוש קולי</h3>
-          <p>לא בא לך להקליד? דבר ישירות למגי — היא מבינה עברית ואנגלית</p>
+          <p>לא בא לך להקליד? דבר ישירות לסוכן — הוא מבין עברית ואנגלית</p>
         </div>
         <div class="feature-card">
           <div class="card-icon">🔗</div>
           <h3>לינקים ישירים</h3>
-          <p>מגי שולחת לינקים לנכסים — לחץ ותגיע ישירות לדף הנכס</p>
+          <p>הסוכן שולח לינקים לנכסים — לחץ ותגיע ישירות לדף הנכס</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Chat Examples -->
+  <!-- Valuation Section -->
   <section class="section section-gray">
+    <div class="container">
+      <div class="section-title-wrap">
+        <h2>הערכת שווי נכס 🏠✨</h2>
+        <p>מעבר לצ'אט — הסוכן החכם יכול גם לנתח תמונות של הנכס שלך ולהעריך את שוויו</p>
+      </div>
+      <div class="valuation-banner" (click)="goToValuation()">
+        <div class="valuation-banner-icon">🏡</div>
+        <div class="valuation-banner-text">
+          <h3>כמה שווה הדירה שלך?</h3>
+          <p>הכלי החדש שלנו מנתח תמונות + נתוני שוק ומחזיר הערכת שווי מדויקת תוך שניות — מבוסס GPT-4o Vision</p>
+          <ul class="valuation-features">
+            <li>✅ ניתוח תמונות AI (מטבח, תאורה, ריצוף, שיפוצים)</li>
+            <li>✅ טווח מחיר + רמת ביטחון</li>
+            <li>✅ עובד עם מצלמה חיה או העלאת קבצים</li>
+          </ul>
+        </div>
+        <button class="valuation-cta-btn">
+          <i class="pi pi-sparkles"></i> נסה עכשיו
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chat Examples -->
+  <section class="section">
     <div class="container">
       <div class="section-title-wrap">
         <h2>מה אפשר לשאול? 💬</h2>
@@ -62,11 +87,11 @@
   </section>
 
   <!-- Voice Steps -->
-  <section class="section">
+  <section class="section section-gray">
     <div class="container">
       <div class="section-title-wrap">
         <h2>איך משתמשים בחיפוש קולי? 🎤</h2>
-        <p>4 צעדים פשוטים — ותוך שניות מגי מחפשת לך נכסים</p>
+        <p>4 צעדים פשוטים — ותוך שניות הסוכן החכם מחפש לך נכסים</p>
       </div>
       <div class="steps-grid">
         <div class="step-card" *ngFor="let step of voiceSteps">
@@ -81,16 +106,16 @@
       <div class="voice-demo">
         <div class="demo-phone">
           <div class="demo-chat-header">
-            <span>🏡 מגי</span>
+            <span>🤖 הסוכן החכם</span>
             <span class="demo-status">מקוון</span>
           </div>
           <div class="demo-messages">
-            <div class="demo-msg bot">שלום! 👋 איך אוכל לעזור לך היום?</div>
+            <div class="demo-msg bot">שלום! 👋 אני הסוכן החכם שלך. איך אוכל לעזור?</div>
             <div class="demo-msg user">🎤 דירה בתל אביב 3 חדרים עד 2 מיליון</div>
             <div class="demo-msg bot">מצאתי 5 דירות מתאימות בתל אביב! 🏠<br>הנה הנכס המומלץ ביותר:<br><span class="demo-link">צפה בנכס 🔗</span></div>
           </div>
           <div class="demo-input">
-            <span>דבר אל מגי...</span>
+            <span>דבר אל הסוכן...</span>
             <span class="demo-mic">🎤</span>
           </div>
         </div>
@@ -99,7 +124,7 @@
   </section>
 
   <!-- Tips -->
-  <section class="section section-gray">
+  <section class="section">
     <div class="container">
       <div class="section-title-wrap">
         <h2>טיפים לשימוש מיטבי ✨</h2>
@@ -117,10 +142,13 @@
   <section class="guide-cta">
     <div class="container text-center">
       <h2>מוכן לנסות? 🚀</h2>
-      <p>פתח את הצ'אט בפינה הימנית התחתונה של המסך ותתחיל לדבר עם מגי</p>
+      <p>פתח את הצ'אט בפינה הימנית התחתונה של המסך ותתחיל לדבר עם הסוכן החכם</p>
       <div class="cta-buttons">
         <button class="cta-btn primary" (click)="openChat()">
           <i class="pi pi-comments"></i> פתח צ'אט
+        </button>
+        <button class="cta-btn secondary" (click)="goToValuation()">
+          <i class="pi pi-sparkles"></i> הערכת שווי
         </button>
         <button class="cta-btn secondary" (click)="goToProducts()">
           <i class="pi pi-home"></i> עיין בנכסים

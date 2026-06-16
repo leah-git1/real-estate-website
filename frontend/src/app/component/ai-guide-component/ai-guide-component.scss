@@ -353,6 +353,73 @@
   }
 }
 
+// ── Valuation Banner ─────────────────────────────────────────────────────────
+.valuation-banner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: linear-gradient(135deg, #1a2e44 0%, #2563eb 100%);
+  border-radius: 20px;
+  padding: 32px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.25);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(37, 99, 235, 0.35);
+  }
+
+  .valuation-banner-icon {
+    font-size: 56px;
+    flex-shrink: 0;
+  }
+
+  .valuation-banner-text {
+    flex: 1;
+    color: white;
+
+    h3 { font-size: 1.4rem; font-weight: 700; margin: 0 0 8px; }
+    p  { font-size: 0.95rem; opacity: 0.85; margin: 0 0 12px; line-height: 1.5; }
+  }
+
+  .valuation-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    li { font-size: 0.88rem; opacity: 0.9; }
+  }
+
+  .valuation-cta-btn {
+    flex-shrink: 0;
+    padding: 14px 28px;
+    background: white;
+    color: #2563eb;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+
+    &:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(255,255,255,0.3); }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    .valuation-features { align-items: center; }
+  }
+}
+
 // ── Responsive ────────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .guide-hero h1 { font-size: 2rem; }

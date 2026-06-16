@@ -14,6 +14,7 @@ export class AiGuideComponent {
   constructor(private router: Router, private chatState: ChatStateService) {}
 
   goToProducts() { this.router.navigate(['/products']); }
+  goToValuation() { this.router.navigate(['/valuation']); }
 
   openChat(message = '') {
     this.router.navigate(['/']).then(() => this.chatState.open(message));
@@ -32,13 +33,13 @@ export class AiGuideComponent {
     { num: '1', icon: '🎤', title: 'לחץ על כפתור המיקרופון', desc: 'הכפתור יהפוך לאדום — זה אומר שאתה מוקלט' },
     { num: '2', icon: '🗣️', title: 'דבר בעברית או אנגלית', desc: 'אמור מה אתה מחפש, למשל: "דירה בחיפה 3 חדרים עד מיליון וחצי"' },
     { num: '3', icon: '🔴', title: 'לחץ שוב לעצור', desc: 'לחץ על הכפתור האדום כדי לסיים את ההקלטה' },
-    { num: '4', icon: '✨', title: 'מגי עונה לך', desc: 'ההודעה שלך נשלחת אוטומטית ומגי מחזירה תשובה' },
+    { num: '4', icon: '✨', title: 'הסוכן החכם עונה לך', desc: 'ההודעה שלך נשלחת אוטומטית והסוכן החכם מחזיר תשובה' },
   ];
 
   tips = [
     { icon: '💡', text: 'ציין עיר, מספר חדרים ותקציב בשאלה אחת' },
-    { icon: '🔗', text: 'מגי שולחת לינקים ישירים לנכסים — לחץ עליהם לפרטים' },
-    { icon: '🌐', text: 'אפשר לדבר עברית או אנגלית — מגי מבינה את שתיהן' },
+    { icon: '🔗', text: 'הסוכן שולח לינקים ישירים לנכסים — לחץ עליהם לפרטים' },
+    { icon: '🌐', text: 'אפשר לדבר עברית או אנגלית — הסוכן מבין את שתיהן' },
     { icon: '📱', text: 'עובד גם בנייד — Chrome ו-Edge תומכים בהקלטה' },
   ];
 }

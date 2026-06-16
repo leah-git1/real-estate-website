@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Output, Input, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, Input, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -19,15 +19,18 @@ import { VoiceSearchService, VoiceSearchResponse } from '../../services/voice-se
   `,
   styles: [`
     .voice-search { display: inline-flex; align-items: center; gap: 6px; }
-    button        { background: none; border: 2px solid #ccc; border-radius: 50%;
+    button        { background: none; border: 2px solid #667eea; border-radius: 50%;
                     width: 40px; height: 40px; cursor: pointer; font-size: 18px;
-                    transition: border-color .2s; }
-    button.active { border-color: #e53935; animation: pulse 1s infinite; }
-    .error        { font-size: 12px; color: #e53935; }
-    @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+                    transition: all .2s; color: #667eea; }
+    button:hover  { background: linear-gradient(135deg, #667eea, #764ba2);
+                    border-color: #764ba2; box-shadow: 0 4px 15px rgba(102,126,234,.3); transform: translateY(-1px); }
+    button.active { border-color: #764ba2; background: linear-gradient(135deg, #667eea, #764ba2);
+                    animation: pulse 1s infinite; }
+    .error        { font-size: 12px; color: #764ba2; }
+    @keyframes pulse { 0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(102,126,234,.4); } 50% { opacity:.7; box-shadow: 0 0 0 6px rgba(102,126,234,0); } }
   `]
 })
-export class VoiceSearchComponent implements OnDestroy {
+export class VoiceSearchComponent implements OnInit, OnDestroy {
   @Input()  chatMode        = false;
   @Output() resultsFound    = new EventEmitter<VoiceSearchResponse>();
   @Output() transcriptReady = new EventEmitter<string>();
@@ -36,28 +39,38 @@ export class VoiceSearchComponent implements OnDestroy {
   error     = '';
 
   private recognition: any = null;
+  // Single subscription set up once — not on every click
   private subs = new Subscription();
+  private searchSubInitialized = false;
 
   constructor(private voiceSearch: VoiceSearchService) {}
 
+  ngOnInit(): void {
+    if (!this.chatMode) {
+      // Subscribe once to listening$ and transcript$ — never duplicated
+      this.subs.add(
+        this.voiceSearch.listening$.subscribe(v => this.listening = v)
+      );
+      this.subs.add(
+        this.voiceSearch.transcript$.pipe(
+          switchMap(text => { this.error = ''; return this.voiceSearch.search(text); })
+        ).subscribe({
+          next:  res => this.resultsFound.emit(res),
+          error: ()  => { this.error = 'החיפוש נכשל. נסה שוב.'; this.listening = false; }
+        })
+      );
+    }
+  }
+
   toggle(): void {
+    if (!this.voiceSearch.isSupported) {
+      this.error = 'הדפדפן לא תומך בהקלטה';
+      return;
+    }
     if (this.chatMode) {
       this.listening ? this.stopChat() : this.startChat();
     } else {
-      if (!this.listening) {
-        this.subs.add(
-          this.voiceSearch.transcript$.pipe(
-            switchMap(text => { this.error = ''; return this.voiceSearch.search(text); })
-          ).subscribe({
-            next:  res => this.resultsFound.emit(res),
-            error: ()  => this.error = 'Search failed. Please try again.'
-          })
-        );
-        this.subs.add(this.voiceSearch.listening$.subscribe(v => this.listening = v));
-        this.voiceSearch.start();
-      } else {
-        this.voiceSearch.stop();
-      }
+      this.listening ? this.voiceSearch.stop() : this.voiceSearch.start();
     }
   }
 

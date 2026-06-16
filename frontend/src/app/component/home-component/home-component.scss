@@ -891,3 +891,125 @@ button.animate-on-scroll { transition-delay: 0.35s; }
     }
   }
 }
+
+// ── AI Appraisal Section ──────────────────────────────────────────────────────
+.ai-appraisal-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  .container { max-width: 1200px; margin: 0 auto; }
+}
+
+.ai-appraisal-card {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  padding: 3rem;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+
+  @media (max-width: 768px) { flex-direction: column; gap: 2rem; padding: 2rem; }
+}
+
+.ai-appraisal-content {
+  flex: 1;
+  color: #fff;
+
+  .ai-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.3rem 0.9rem;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(255,255,255,0.35);
+  }
+
+  h2 { font-size: 2rem; font-weight: 800; margin: 0 0 0.8rem; }
+  p  { color: rgba(255,255,255,0.88); line-height: 1.7; margin-bottom: 1.5rem; }
+
+  .ai-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+
+    li {
+      padding: 0.35rem 0;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.95rem;
+      .check { margin-left: 0.5rem; }
+    }
+  }
+
+  .ai-appraisal-btn {
+    background: white !important;
+    border: none !important;
+    border-radius: 50px !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    padding: 0.9rem 2rem !important;
+    color: #667eea !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+    transition: all 0.3s !important;
+
+    &:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.3) !important;
+      background: rgba(255,255,255,0.92) !important;
+    }
+  }
+}
+
+.ai-appraisal-visual {
+  flex: 0 0 300px;
+
+  .appraisal-mockup {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 1.8rem;
+    color: #fff;
+    text-align: center;
+
+    .mockup-header  { font-size: 0.85rem; opacity: 0.7; margin-bottom: 0.8rem; }
+    .mockup-price   { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.4rem; }
+    .mockup-range   { font-size: 0.8rem; opacity: 0.65; margin-bottom: 1.2rem; }
+
+    .mockup-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      margin-bottom: 0.4rem;
+      overflow: hidden;
+
+      .mockup-bar-fill {
+        height: 100%;
+        background: rgba(255,255,255,0.85);
+        border-radius: 4px;
+      }
+    }
+
+    .mockup-confidence { font-size: 0.8rem; opacity: 0.7; margin-bottom: 1.2rem; }
+
+    .mockup-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+
+      span {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 0.25rem 0.7rem;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.9);
+      }
+    }
+  }
+}

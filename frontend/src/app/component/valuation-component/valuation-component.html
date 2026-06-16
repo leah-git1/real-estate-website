@@ -1,0 +1,279 @@
+<div class="valuation-page" dir="rtl">
+  <p-toast position="top-center"></p-toast>
+
+  <!-- ── Page Header ──────────────────────────────────────────────────── -->
+  <div class="valuation-header">
+    <div class="header-icon">🏠</div>
+    <h1>הערכת שווי נכס בינה מלאכותית</h1>
+    <p>קבל הערכת שווי מדויקת תוך שניות, מבוססת על ניתוח תמונות ונתוני שוק</p>
+  </div>
+
+  <!-- ── Step Indicator ───────────────────────────────────────────────── -->
+  <div class="step-indicator">
+    <div class="step-item" [class.active]="step >= 1" [class.done]="step > 1">
+      <div class="step-circle">{{ step > 1 ? '✓' : '1' }}</div>
+      <span>פרטי הנכס</span>
+    </div>
+    <div class="step-line" [class.done]="step > 1"></div>
+    <div class="step-item" [class.active]="step >= 2" [class.done]="step > 2">
+      <div class="step-circle">{{ step > 2 ? '✓' : '2' }}</div>
+      <span>העלאת תמונות</span>
+    </div>
+    <div class="step-line" [class.done]="step > 2"></div>
+    <div class="step-item" [class.active]="step >= 3">
+      <div class="step-circle">3</div>
+      <span>תוצאות</span>
+    </div>
+  </div>
+
+  <div class="wizard-card">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         STEP 1 — Property Info
+    ════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="step === 1" class="wizard-step">
+      <h2 class="step-title">📋 פרטי הנכס</h2>
+      <p class="step-subtitle">מלא את הפרטים הבסיסיים של הנכס לקבלת הערכה מדויקת</p>
+
+      <form [formGroup]="form" class="property-form">
+        <div class="form-row">
+          <div class="form-field full-width">
+            <label>כתובת מלאה *</label>
+            <input pInputText formControlName="address" placeholder="רחוב הרצל 12, דירה 4" />
+            <small class="error" *ngIf="form.get('address')?.invalid && form.get('address')?.touched">
+              כתובת חובה (לפחות 5 תווים)
+            </small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label>עיר *</label>
+            <input pInputText formControlName="city" placeholder="תל אביב" />
+            <small class="error" *ngIf="form.get('city')?.invalid && form.get('city')?.touched">
+              עיר חובה
+            </small>
+          </div>
+          <div class="form-field">
+            <label>מספר חדרים *</label>
+            <p-inputNumber formControlName="rooms" [min]="1" [max]="20"
+                           placeholder="4" [showButtons]="true" />
+            <small class="error" *ngIf="form.get('rooms')?.invalid && form.get('rooms')?.touched">
+              מספר חדרים חובה
+            </small>
+          </div>
+          <div class="form-field">
+            <label>שטח במ"ר *</label>
+            <p-inputNumber formControlName="sqm" [min]="20" [max]="1000"
+                           placeholder="85" suffix=" מ״ר" />
+            <small class="error" *ngIf="form.get('sqm')?.invalid && form.get('sqm')?.touched">
+              שטח חובה
+            </small>
+          </div>
+        </div>
+      </form>
+
+      <div class="step-actions">
+        <button pButton label="המשך לשלב הבא" icon="pi pi-arrow-left"
+                iconPos="left" (click)="nextToUpload()" class="btn-primary"></button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         STEP 2 — File Upload
+    ════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="step === 2" class="wizard-step">
+      <h2 class="step-title">📸 העלאת תמונות</h2>
+      <p class="step-subtitle">העלה עד 4 תמונות של הנכס לניתוח מדויק יותר (אופציונלי)</p>
+
+      <!-- canvas must live OUTSIDE *ngIf so @ViewChild always resolves -->
+      <canvas #canvasEl hidden></canvas>
+
+      <!-- Live Camera -->
+      <div class="camera-section">
+
+        <!-- Inactive state: launch button -->
+        <div class="camera-launch" *ngIf="!cameraActive">
+          <button class="cam-launch-btn" (click)="startCamera()">
+            <i class="pi pi-camera"></i>
+            <span>פתח מצלמה לצילום ישיר</span>
+          </button>
+          <p *ngIf="cameraError" class="camera-error">⚠️ {{ cameraError }}</p>
+        </div>
+
+        <!-- Active camera UI -->
+        <div class="camera-active-wrap" *ngIf="cameraActive">
+
+          <!-- Video feed -->
+          <div class="camera-feed">
+            <video #videoEl autoplay playsinline muted></video>
+
+            <!-- Recording badge overlay -->
+            <div class="rec-badge" *ngIf="recording">
+              <span class="rec-dot"></span> מקליט {{ recordingSecs }}s
+            </div>
+          </div>
+
+          <!-- Controls bar below the video -->
+          <div class="camera-controls">
+            <button class="ctrl-btn record" (click)="startRecording()" *ngIf="!recording" title="הקלט וידאו">
+              <i class="pi pi-circle-fill"></i>
+              <span>הקלט</span>
+            </button>
+            <button class="ctrl-btn stop-rec" (click)="stopRecording()" *ngIf="recording" title="עצור הקלטה">
+              <i class="pi pi-stop"></i>
+              <span>עצור</span>
+            </button>
+            <button class="ctrl-btn capture" (click)="capturePhoto()" [disabled]="recording" title="צלם תמונה">
+              <i class="pi pi-camera"></i>
+              <span>צלם</span>
+            </button>
+            <span class="frame-count">{{ selectedFiles.length }} / {{ MAX_FRAMES }} תמונות</span>
+            <button class="ctrl-btn close-cam" (click)="stopCamera()" title="סגור מצלמה">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+
+          <!-- Inline previews while camera is open -->
+          <div class="inline-previews" *ngIf="previewUrls.length > 0">
+            <div class="inline-preview-item" *ngFor="let url of previewUrls; let i = index">
+              <img [src]="url" alt="תצוגה {{ i + 1 }}" />
+              <span class="preview-num">{{ i + 1 }}</span>
+              <button class="remove-btn" (click)="removeFile(i)" title="הסר">✕</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Drop Zone -->
+      <div class="drop-zone"
+           (dragover)="onDragOver($event)"
+           (drop)="onDrop($event)"
+           (click)="fileInput.click()">
+        <input #fileInput type="file" accept="image/*"
+               multiple hidden (change)="onFilesSelected($event)" />
+        <div class="drop-zone-content">
+          <div class="drop-icon">📁</div>
+          <p class="drop-title">גרור תמונות לכאן או לחץ לבחירה</p>
+          <p class="drop-hint">JPG, PNG — עד 4 תמונות</p>
+        </div>
+      </div>
+
+      <!-- Previews — shown after both photo capture AND video recording -->
+      <div class="preview-grid" *ngIf="previewUrls.length > 0">
+        <div class="preview-item" *ngFor="let url of previewUrls; let i = index">
+          <img [src]="url" alt="תצוגה מקדימה {{ i + 1 }}" />
+          <span class="preview-num">{{ i + 1 }}</span>
+          <button class="remove-btn" (click)="removeFile(i)" title="הסר">✕</button>
+        </div>
+      </div>
+
+      <!-- Progress Bar (shown while analyzing) -->
+      <div class="progress-section" *ngIf="loading">
+        <p class="progress-label">🤖 הבינה המלאכותית מנתחת את הנכס...</p>
+        <p-progressBar [value]="uploadPct" [showValue]="true"></p-progressBar>
+      </div>
+
+      <div class="step-actions">
+        <button pButton label="חזור" icon="pi pi-arrow-right"
+                class="btn-secondary" (click)="step = 1" [disabled]="loading"></button>
+        <button pButton [label]="selectedFiles.length > 0 ? 'נתח עם ' + selectedFiles.length + ' תמונות' : 'נתח ללא תמונות'"
+                icon="pi pi-sparkles" iconPos="left"
+                (click)="analyze()" [loading]="loading" class="btn-primary"></button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         STEP 3 — Results
+    ════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="step === 3 && result" class="wizard-step results-step">
+      <h2 class="step-title">📊 תוצאות הערכת השווי</h2>
+
+      <!-- ── GUEST VIEW ─────────────────────────────────────────────── -->
+      <div *ngIf="result.isGuest" class="guest-results">
+        <div class="price-range-card">
+          <div class="range-label">טווח מחיר משוער</div>
+          <div class="range-value">
+            {{ formatPrice(result.priceRange!.min) }} — {{ formatPrice(result.priceRange!.max) }}
+          </div>
+          <div class="range-note">* הערכה כללית בלבד</div>
+        </div>
+
+        <div class="lock-overlay">
+          <div class="lock-card">
+            <div class="lock-icon">🔒</div>
+            <h3>הדוח המלא נעול</h3>
+            <p>הירשם כדי לקבל את הניתוח המלא הכולל:</p>
+            <ul>
+              <li>✅ שווי מדויק</li>
+              <li>✅ רמת ביטחון</li>
+              <li>✅ ניתוח מטבח, תאורה, שיפוצים ורצפה</li>
+              <li>✅ הערכה כוללת</li>
+            </ul>
+            <button pButton label="הירשם לצפייה בדוח המלא"
+                    icon="pi pi-user-plus" (click)="goToAuth()" class="btn-primary"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REGISTERED USER VIEW ───────────────────────────────────── -->
+      <div *ngIf="!result.isGuest" class="full-results">
+
+        <!-- Main valuation -->
+        <div class="valuation-hero">
+          <div class="valuation-label">שווי משוער</div>
+          <div class="valuation-value">{{ formatPrice(result.valuation!) }}</div>
+          <div class="valuation-range">
+            טווח: {{ formatPrice(result.priceRange!.min) }} — {{ formatPrice(result.priceRange!.max) }}
+          </div>
+        </div>
+
+        <!-- Confidence meter -->
+        <div class="confidence-section">
+          <div class="confidence-label">רמת ביטחון: {{ confidencePct }}%</div>
+          <p-progressBar [value]="confidencePct"
+                         [style]="{'height': '12px'}"
+                         [styleClass]="confidencePct >= 80 ? 'confidence-high' : confidencePct >= 60 ? 'confidence-mid' : 'confidence-low'">
+          </p-progressBar>
+        </div>
+
+        <!-- Detail cards -->
+        <div class="details-grid" *ngIf="result.details">
+          <div class="detail-card">
+            <div class="detail-icon">🍳</div>
+            <div class="detail-title">מטבח</div>
+            <div class="detail-text">{{ result.details.kitchen }}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">💡</div>
+            <div class="detail-title">תאורה</div>
+            <div class="detail-text">{{ result.details.lighting }}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">🔨</div>
+            <div class="detail-title">שיפוצים</div>
+            <div class="detail-text">{{ result.details.renovations }}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">🪵</div>
+            <div class="detail-title">ריצוף</div>
+            <div class="detail-text">{{ result.details.flooring }}</div>
+          </div>
+        </div>
+
+        <!-- Overall impression -->
+        <div class="overall-card" *ngIf="result.details?.overall">
+          <div class="overall-title">🏡 רושם כללי</div>
+          <div class="overall-text">{{ result.details!.overall }}</div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button pButton label="הערכה חדשה" icon="pi pi-refresh"
+                class="btn-secondary" (click)="restart()"></button>
+      </div>
+    </div>
+
+  </div>
+</div>

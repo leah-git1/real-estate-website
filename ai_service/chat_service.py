@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import json
+import base64
 
 load_dotenv()
 
@@ -139,3 +140,167 @@ async def parse_search(req: ParseSearchRequest):
         'has_parking': parsed.get('has_parking'),
     }
     return result
+
+
+# ── Property Valuation prompt ─────────────────────────────────────────────────
+
+VALUATION_SYSTEM_PROMPT = """
+You are a certified real estate appraiser with 20 years of experience in the Israeli market.
+You will receive property metadata and one or more images of the property.
+Analyze the visual content carefully and return ONLY a valid JSON object — no markdown, no explanation.
+
+Return exactly this structure:
+{
+  "valuation":   <number — estimated market value in ILS>,
+  "confidence":  <number between 0 and 1 — your confidence in the estimate>,
+  "price_range": { "min": <number>, "max": <number> },
+  "details": {
+    "kitchen":     <string — quality assessment of the kitchen>,
+    "lighting":    <string — natural and artificial lighting quality>,
+    "renovations": <string — visible renovation level and recency>,
+    "flooring":    <string — flooring type and condition>,
+    "overall":     <string — one-sentence overall impression>
+  }
+}
+
+Rules:
+- Base the valuation on: city, rooms, sqm, and the visual quality observed in the images.
+- Israeli market prices: Tel Aviv ~50,000-80,000 ILS/sqm, Jerusalem ~30,000-50,000 ILS/sqm, other cities ~15,000-35,000 ILS/sqm.
+- confidence: 0.9 if images are clear and detailed, 0.6-0.8 if partial, 0.4-0.5 if no images.
+- price_range: min = valuation * 0.92, max = valuation * 1.08.
+- Respond with the raw JSON object only.
+"""
+
+
+class ValuationRequest(BaseModel):
+    address: str
+    rooms:   int
+    sqm:     int
+    city:    str
+    images:  list[str] = []   # base64-encoded images (data URLs)
+
+
+@app.post('/analyze-property')
+async def analyze_property(req: ValuationRequest):
+    if not req.address or not req.city:
+        raise HTTPException(status_code=400, detail='address and city are required')
+
+    metadata = (
+        f"Property details:\n"
+        f"- Address: {req.address}\n"
+        f"- City: {req.city}\n"
+        f"- Rooms: {req.rooms}\n"
+        f"- Size: {req.sqm} sqm\n"
+        f"Please analyze and provide a valuation."
+    )
+
+    # Build multimodal message content
+    content: list = [{'type': 'text', 'text': metadata}]
+    for img in req.images[:4]:   # cap at 4 images to control token cost
+        # Accept both raw base64 and full data URLs
+        if img.startswith('data:'):
+            url = img
+        else:
+            url = f'data:image/jpeg;base64,{img}'
+        content.append({
+            'type': 'image_url',
+            'image_url': {'url': url, 'detail': 'low'}
+        })
+
+    response = client.chat.completions.create(
+        model='gpt-4o',
+        messages=[
+            {'role': 'system', 'content': VALUATION_SYSTEM_PROMPT},
+            {'role': 'user',   'content': content}
+        ],
+        temperature=0.2,
+        max_tokens=512,
+        response_format={'type': 'json_object'}
+    )
+
+    raw = response.choices[0].message.content
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail=f'LLM returned invalid JSON: {raw}')
+
+    return {
+        'valuation':   parsed.get('valuation'),
+        'confidence':  parsed.get('confidence'),
+        'price_range': parsed.get('price_range', {}),
+        'details':     parsed.get('details', {}),
+    }
+
+
+# ── Property Valuation — multipart endpoint (binary image upload) ─────────────
+
+@app.post('/analyze-property-multipart')
+async def analyze_property_multipart(
+    address: str              = Form(...),
+    city:    str              = Form(...),
+    rooms:   int              = Form(...),
+    sqm:     int              = Form(...),
+    images:  list[UploadFile] = File(default=[]),
+):
+    """Accepts raw image files (JPEG/PNG) from .NET via multipart/form-data.
+    Reads each file's bytes, encodes to base64, and passes to GPT-4o vision.
+    """
+    if not address or not city:
+        raise HTTPException(status_code=400, detail='address and city are required')
+
+    ALLOWED_MIME = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
+
+    metadata = (
+        f"Property details:\n"
+        f"- Address: {address}\n"
+        f"- City: {city}\n"
+        f"- Rooms: {rooms}\n"
+        f"- Size: {sqm} sqm\n"
+        f"Please analyze and provide a valuation."
+    )
+
+    content: list = [{'type': 'text', 'text': metadata}]
+
+    for upload in images[:4]:   # cap at 4 images
+        mime = upload.content_type or 'image/jpeg'
+
+        if mime not in ALLOWED_MIME:
+            raise HTTPException(
+                status_code=400,
+                detail=f"File '{upload.filename}' has unsupported type '{mime}'. "
+                       f"Only JPEG, PNG, WebP and GIF are accepted."
+            )
+
+        # Read raw bytes and encode to base64 data URL
+        raw_bytes  = await upload.read()
+        b64_string = base64.b64encode(raw_bytes).decode('utf-8')
+        data_url   = f'data:{mime};base64,{b64_string}'
+
+        content.append({
+            'type': 'image_url',
+            'image_url': {'url': data_url, 'detail': 'low'}
+        })
+
+    response = client.chat.completions.create(
+        model='gpt-4o',
+        messages=[
+            {'role': 'system', 'content': VALUATION_SYSTEM_PROMPT},
+            {'role': 'user',   'content': content}
+        ],
+        temperature=0.2,
+        max_tokens=512,
+        response_format={'type': 'json_object'}
+    )
+
+    raw = response.choices[0].message.content
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail=f'LLM returned invalid JSON: {raw}')
+
+    return {
+        'valuation':   parsed.get('valuation'),
+        'confidence':  parsed.get('confidence'),
+        'price_range': parsed.get('price_range', {}),
+        'details':     parsed.get('details', {}),
+    }

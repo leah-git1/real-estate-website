@@ -290,4 +290,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   goToBlog() {
     this.router.navigate(['/blog']);
   }
+
+  goToValuation() {
+    this.router.navigate(['/valuation']);
+  }
 }

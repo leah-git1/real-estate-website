@@ -15,6 +15,7 @@ import { ContactComponent } from './component/contact-component/contact-componen
 import { BlogComponent } from './component/blog-component/blog-component';
 import { FavoritesComponent } from './component/favorites-component/favorites-component';
 import { AiGuideComponent } from './component/ai-guide-component/ai-guide-component';
+import { ValuationComponent } from './component/valuation-component/valuation-component';
 import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
@@ -22,7 +23,8 @@ export const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'blog', component: BlogComponent },
-  { path: 'ai-guide', component: AiGuideComponent },
+  { path: 'ai-guide',  component: AiGuideComponent },
+  { path: 'valuation', component: ValuationComponent },
   { path: 'products', component: ProductListComponent },
   { path: 'auth', component: AuthComponent },
   { path: 'cart', component: CartComponent },
