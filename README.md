@@ -10,11 +10,11 @@ A full-stack real estate brokerage platform with AI-powered voice search, a conv
 
 | Home Page | Property Listings | Property Details |
 |:---------:|:-----------------:|:----------------:|
-| ![Home](docs/screenshots/home.png) | ![Listings](docs/screenshots/listings.png) | ![Details](docs/screenshots/details.png) |
+| ![Home](/assets/home.png) | ![Listings](/assets/products.png) | ![Details](/assets/dashboard.png) |
 
-| AI Chat Assistant | Voice Search | Admin Dashboard |
+| AI Chat Assistant | Property valuation(AI) | Add product |
 |:-----------------:|:------------:|:---------------:|
-| ![Chat](docs/screenshots/chat.png) | ![Voice](docs/screenshots/voice.png) | ![Admin](docs/screenshots/admin.png) |
+| ![Chat](/assets/chat.png) | ![Valuation](/assets/value.png) | ![Add](/assets/add.png) |
 
 ---
 
