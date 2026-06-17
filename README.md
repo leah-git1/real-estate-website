@@ -1,6 +1,6 @@
 # 🏡 Real Estate Website — Full Stack Platform
 
-A full-stack real estate brokerage platform with AI-powered voice search, a conversational chatbot assistant, property listings, cart, favorites, orders, and an admin dashboard.
+A full-stack real estate brokerage platform with AI-powered voice search, a conversational chatbot assistant, **AI property valuation with image analysis**, property listings, cart, favorites, orders, and an admin dashboard.
 
 ---
 
@@ -12,8 +12,8 @@ A full-stack real estate brokerage platform with AI-powered voice search, a conv
 |:---------:|:-----------------:|:----------------:|
 | ![Home](/assets/home.png) | ![Listings](/assets/products.png) | ![Details](/assets/dashboard.png) |
 
-| AI Chat Assistant | Property valuation(AI) | Add product |
-|:-----------------:|:------------:|:---------------:|
+| AI Smart Agent | Property Valuation (AI) | Add Product |
+|:--------------:|:-----------------------:|:-----------:|
 | ![Chat](/assets/chat.png) | ![Valuation](/assets/value.png) | ![Add](/assets/add.png) |
 
 ---
@@ -26,13 +26,53 @@ real-estate-website/
 ├── frontend/                  # Angular 21 — Client Application
 │   └── src/app/
 │       ├── component/         # All UI components
+│       │   ├── ai-guide-component/       # Smart Agent guide page
+│       │   ├── valuation-component/      # AI property valuation wizard
+│       │   ├── valuation-btn/            # Persistent side-tab shortcut
+│       │   ├── chat/                     # GPT-4o chat (floating)
+│       │   ├── chatbot-component/        # Simple rule-based chatbot
+│       │   ├── voice-search/             # Mic button + Web Speech API
+│       │   ├── home-component/
+│       │   ├── product-list-component/
+│       │   ├── product-details-component/
+│       │   ├── add-product-component/
+│       │   ├── edit-product-component/
+│       │   ├── auth/
+│       │   ├── cart-component/
+│       │   ├── cart-sidebar/
+│       │   ├── checkout-component/
+│       │   ├── favorites-component/
+│       │   ├── favorites-sidebar/
+│       │   ├── user-profile-component/
+│       │   ├── admin-dashboard-component/
+│       │   ├── contact-component/
+│       │   ├── blog-component/
+│       │   └── order-success-component/
 │       ├── services/          # HTTP & business logic services
+│       │   ├── valuation.service.ts      # Valuation API calls
+│       │   ├── voice-search.service.ts   # Voice search API calls
+│       │   ├── chat_service.ts           # GPT-4o chat API calls
+│       │   ├── chat-state.service.ts     # Chat open/prefill state
+│       │   ├── product-service.ts
+│       │   ├── user-service.ts
+│       │   ├── order-service.ts
+│       │   ├── cart-service.ts
+│       │   ├── favorites-service.ts
+│       │   └── ...
 │       ├── models/            # TypeScript interfaces & models
 │       ├── guards/            # Route guards (admin)
 │       └── app.routes.ts      # Application routing
 │
 ├── backend/                   # .NET 8 C# — Web API
-│   ├── WebApiShop/            # Main API project (controllers, middleware)
+│   ├── WebApiShop/            # Main API project
+│   │   └── Controllers/
+│   │       ├── ProductController.cs
+│   │       ├── ChatController.cs
+│   │       ├── VoiceSearchController.cs
+│   │       ├── ValuationController.cs    # Property valuation proxy
+│   │       ├── UsersController.cs
+│   │       ├── OrderController.cs
+│   │       └── ...
 │   ├── Services/              # Business logic layer
 │   ├── Repository/            # Data access layer (EF Core)
 │   ├── Entities/              # Database entity models
@@ -41,7 +81,9 @@ real-estate-website/
 │   └── TestProject/           # Integration & unit tests
 │
 └── ai_service/                # Python — FastAPI AI Microservice
-    ├── chat_service.py        # Chat + Voice Search endpoints
+    ├── chat_service.py        # All AI endpoints (chat, voice, valuation)
+    ├── test_chat_service.py   # Pytest test suite
+    ├── requirements.txt       # Python dependencies
     └── .env                   # API keys (not committed)
 ```
 
@@ -50,39 +92,42 @@ real-estate-website/
 ## 🏛️ Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        BROWSER (Angular 21)                     │
-│                                                                 │
-│   ┌──────────────┐   ┌─────────────────┐   ┌───────────────┐  │
-│   │  Property    │   │   AI Chatbot    │   │ Voice Search  │  │
-│   │  Listings    │   │   (Maggie 🏡)   │   │  🎤 Button    │  │
-│   └──────┬───────┘   └────────┬────────┘   └───────┬───────┘  │
-│          │                    │                     │           │
-│          │         Web Speech API (he-IL)           │           │
-└──────────┼────────────────────┼─────────────────────┼───────────┘
-           │                    │                     │
-           │         HTTP (localhost:44305)            │
-           ▼                    ▼                     ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   .NET 8 Web API (C#)                           │
-│                                                                 │
-│   ProductController   ChatController   VoiceSearchController    │
-│   UsersController     OrderController  POST /api/search/voice   │
-│                                                                 │
-│              Entity Framework Core → SQL Server                 │
-└─────────────────────────────┬───────────────────────────────────┘
-                              │
-                    HTTP (localhost:8001)
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                Python FastAPI AI Microservice                   │
-│                                                                 │
-│    POST /chat              POST /parse-search                   │
-│    (Maggie chatbot)        (Voice search extractor)             │
-│                                                                 │
-│              OpenAI GPT-4o / GPT-4o-mini                       │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          BROWSER (Angular 21)                           │
+│                                                                         │
+│  ┌──────────────┐  ┌─────────────────┐  ┌──────────┐  ┌────────────┐  │
+│  │  Property    │  │  Smart Agent    │  │  Voice   │  │ Valuation  │  │
+│  │  Listings    │  │  Chat 🤖        │  │  Search  │  │ Wizard 🏠  │  │
+│  └──────┬───────┘  └────────┬────────┘  └────┬─────┘  └─────┬──────┘  │
+│         │                   │                │               │         │
+│         │          Web Speech API (he-IL)    │               │         │
+└─────────┼───────────────────┼────────────────┼───────────────┼─────────┘
+          │                   │                │               │
+          │         HTTP (localhost:44305)                      │
+          ▼                   ▼                ▼               ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       .NET 8 Web API (C#)                               │
+│                                                                         │
+│  ProductController  ChatController  VoiceSearchController               │
+│  UsersController    OrderController ValuationController                 │
+│                                                                         │
+│               Entity Framework Core → SQL Server                       │
+└──────────────────────────────┬──────────────────────────────────────────┘
+                               │
+                     HTTP (localhost:8001)
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                  Python FastAPI AI Microservice                         │
+│                                                                         │
+│   POST /chat              POST /parse-search                            │
+│   (Smart Agent)           (Voice search extractor)                      │
+│                                                                         │
+│   POST /analyze-property-multipart                                      │
+│   (Property valuation — GPT-4o Vision + image upload)                  │
+│                                                                         │
+│               OpenAI GPT-4o / GPT-4o-mini                              │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -95,18 +140,32 @@ real-estate-website/
 - Add / Edit / Delete listings (authenticated owners)
 - Featured properties on the home page
 
-### 🔍 Voice Search *(New Feature)*
+### 🔍 Voice Search
 - Click the 🎤 microphone button and speak your search in **Hebrew or English**
 - Browser converts speech to text using the native **Web Speech API**
 - Text is sent to the .NET API → forwarded to the Python AI service
 - **GPT-4o-mini** extracts structured filters: city, rooms, max price, balcony, parking
 - Results are filtered and returned instantly
 
-### 🤖 AI Chat Assistant (Maggie 🏡)
+### 🤖 Smart Agent (AI Chat)
 - Conversational assistant powered by **GPT-4o**
 - Knows the full property catalog in real time
 - Responds in the same language the user writes in (Hebrew / English)
 - Provides clickable property links, owner contact info, and smart recommendations
+- Voice input supported directly inside the chat
+
+### 🏠 AI Property Valuation *(Feature)*
+- 3-step wizard: property details → image upload → results
+- **Live camera capture** — open the camera, record a clip or take snapshots; frames are extracted in real time and displayed as thumbnails immediately
+- **File upload** — drag & drop or select JPEG/PNG images
+- **GPT-4o Vision** analyzes images and returns:
+  - Estimated market value in ILS
+  - Price range (min / max)
+  - Confidence level (0–1)
+  - Room-by-room breakdown: kitchen, lighting, renovations, flooring
+  - Overall impression
+- Guest users see a blurred teaser; registered users get the full report
+- A persistent ✨ side tab on the right edge of the screen provides quick access
 
 ### 🛒 Cart & Orders
 - Add properties to cart, proceed to checkout
@@ -126,6 +185,90 @@ real-estate-website/
 
 ### 📧 Email Notifications
 - Automated emails via MailKit / Gmail SMTP on inquiry and order events
+
+### 📢 Ad Popup
+- A periodic promotional popup appears every ~25 seconds (then every 90 s) advertising the Smart Agent and Valuation pages
+
+---
+
+## 🏠 AI Property Valuation — Deep Dive
+
+### How It Works
+
+```
+User opens Valuation page (/valuation)
+         │
+         ▼
+  Step 1 — Fill property details
+  (address, city, rooms, sqm)
+         │
+         ▼
+  Step 2 — Add images (optional)
+  ┌────────────────────────────────────────┐
+  │  Option A: Live Camera                  │
+  │  → Click "פתח מצלמה"                   │
+  │  → Press "הקלט" — frames captured      │
+  │    every 2 s from live video feed      │
+  │    and shown as thumbnails instantly   │
+  │  → Press "עצור" to finish              │
+  │  Option B: Drag & Drop / File Picker   │
+  │  → Select up to 4 JPEG / PNG files     │
+  └────────────────────────────────────────┘
+         │
+         ▼
+  Angular ValuationService
+  POST https://localhost:44305/api/valuation/analyze
+  multipart/form-data: { address, city, rooms, sqm, images[] }
+         │
+         ▼
+  .NET ValuationController
+  forwards to Python ai_service
+  POST http://localhost:8001/analyze-property-multipart
+         │
+         ▼
+  Python FastAPI + GPT-4o Vision
+  returns structured JSON:
+  {
+    "valuation":   3500000,
+    "confidence":  0.82,
+    "price_range": { "min": 3220000, "max": 3780000 },
+    "details": {
+      "kitchen":     "...",
+      "lighting":    "...",
+      "renovations": "...",
+      "flooring":    "...",
+      "overall":     "..."
+    }
+  }
+         │
+         ▼
+  Step 3 — Results displayed
+  (guest: blurred teaser | registered: full report)
+```
+
+### Valuation Response Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `valuation` | `number` | Estimated market value in ILS |
+| `confidence` | `number` (0–1) | Model confidence in the estimate |
+| `price_range.min` | `number` | Lower bound (valuation × 0.92) |
+| `price_range.max` | `number` | Upper bound (valuation × 1.08) |
+| `details.kitchen` | `string` | Kitchen quality assessment |
+| `details.lighting` | `string` | Lighting quality |
+| `details.renovations` | `string` | Renovation level |
+| `details.flooring` | `string` | Flooring type and condition |
+| `details.overall` | `string` | One-sentence overall impression |
+
+### Files Added / Modified
+
+| File | Change |
+|------|--------|
+| `frontend/src/app/component/valuation-component/` | New — 3-step wizard UI |
+| `frontend/src/app/component/valuation-btn/` | New — persistent side tab |
+| `frontend/src/app/services/valuation.service.ts` | New — HTTP calls to backend |
+| `backend/WebApiShop/Controllers/ValuationController.cs` | New — proxy to Python |
+| `ai_service/chat_service.py` | Added `/analyze-property` and `/analyze-property-multipart` endpoints |
 
 ---
 
@@ -170,37 +313,6 @@ User speaks Hebrew:
   returned to Angular → displayed to user
 ```
 
-### Extracted JSON Structure
-
-```json
-{
-  "city":        "Tel Aviv",
-  "rooms":       4,
-  "max_price":   2500000,
-  "has_balcony": null,
-  "has_parking": true
-}
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `city` | `string \| null` | City name in English |
-| `rooms` | `integer \| null` | Number of rooms |
-| `max_price` | `number \| null` | Maximum price in ILS |
-| `has_balcony` | `boolean \| null` | `true` = wanted, `false` = excluded, `null` = not mentioned |
-| `has_parking` | `boolean \| null` | `true` = wanted, `false` = excluded, `null` = not mentioned |
-
-### Files Added / Modified
-
-| File | Change |
-|------|--------|
-| `frontend/src/app/services/voice-search.service.ts` | New — Web Speech API + HTTP service |
-| `frontend/src/app/component/voice-search/voice-search.component.ts` | New — Mic button component |
-| `backend/WebApiShop/Controllers/VoiceSearchController.cs` | New — `POST /api/search/voice` |
-| `backend/WebApiShop/Program.cs` | Added named `HttpClient` for ai_service |
-| `backend/WebApiShop/appsettings.json` | Added `AiService:BaseUrl` |
-| `ai_service/chat_service.py` | Added `POST /parse-search` endpoint |
-
 ---
 
 ## 🛠️ Tech Stack
@@ -229,9 +341,12 @@ User speaks Hebrew:
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | Python | 3.11+ | Runtime |
-| FastAPI | latest | API framework |
-| OpenAI SDK | latest | GPT-4o / GPT-4o-mini |
+| FastAPI | ≥0.111 | API framework |
+| OpenAI SDK | ≥1.30 | GPT-4o / GPT-4o-mini / Vision |
 | python-dotenv | latest | Environment config |
+| python-multipart | ≥0.0.9 | File upload support |
+| pytest | ≥8.2 | Test runner |
+| httpx | ≥0.27 | TestClient transport |
 
 ### Database
 | Technology | Purpose |
@@ -266,7 +381,7 @@ cd real-estate-website
 
 ```bash
 cd ai_service
-pip install fastapi uvicorn openai python-dotenv
+pip install -r requirements.txt
 ```
 
 Create the `.env` file:
@@ -365,7 +480,7 @@ cd frontend && ng serve
 | `GET` | `/api/product/search` | Text search |
 | `GET` | `/api/product/featured` | Featured listings |
 
-### Voice Search *(New)*
+### Voice Search
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/search/voice` | Parse Hebrew voice transcript → filtered results |
@@ -373,7 +488,12 @@ cd frontend && ng serve
 ### Chat
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/chat` | Send message to Maggie AI assistant |
+| `POST` | `/api/chat` | Send message to Smart Agent AI |
+
+### Property Valuation
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/valuation/analyze` | Upload images + property data → AI valuation report |
 
 ### Users
 | Method | Endpoint | Description |
@@ -391,8 +511,10 @@ cd frontend && ng serve
 ### Python AI Service
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/chat` | Maggie chatbot |
+| `POST` | `/chat` | Smart Agent chatbot |
 | `POST` | `/parse-search` | Voice search parameter extraction |
+| `POST` | `/analyze-property` | Valuation via base64 images (JSON) |
+| `POST` | `/analyze-property-multipart` | Valuation via file upload (multipart) |
 
 ---
 
@@ -440,6 +562,7 @@ Ratings (HTTP request log)
 - CORS configured to allow only `http://localhost:4200`
 - `.env` file is git-ignored — never commit API keys
 - Email credentials should use Gmail App Passwords, not your main password
+- Valuation images are processed in memory only — never persisted to disk
 
 ---
 
@@ -453,13 +576,33 @@ dotnet test
 # Angular tests
 cd frontend
 ng test
+
+# Python AI service tests
+cd ai_service
+pytest test_chat_service.py -v
 ```
 
-Test projects cover:
-- `CategoriesUnitTest` / `CategoriesIntegrationTest`
-- `ProductUnitTest` / `ProductIntegrationTest`
-- `OrdersUnitTest` / `OrderIntegrationTest`
-- `UserUnitTest` / `UserIntegrationTest`
+### Python Test Coverage
+
+| Test Class | Endpoint | Cases |
+|------------|----------|-------|
+| `TestChat` | `POST /chat` | Basic reply, product catalog injection, history, empty message |
+| `TestParseSearch` | `POST /parse-search` | Full params, partial params, all-null, empty/whitespace 400, invalid JSON 500, parking excluded |
+| `TestAnalyzeProperty` | `POST /analyze-property` | No images, base64 image, cap at 4, missing fields 400, invalid JSON 500 |
+| `TestAnalyzePropertyMultipart` | `POST /analyze-property-multipart` | No images, JPEG upload, cap at 4, unsupported type 400, missing fields 422, invalid JSON 500 |
+
+### .NET Test Coverage
+
+| Test Class | Description |
+|------------|-------------|
+| `CategoriesUnitTest` | Category service unit tests |
+| `CategoriesIntegrationTest` | Category API integration tests |
+| `ProductUnitTest` | Product service unit tests |
+| `ProductIntegrationTest` | Product API integration tests |
+| `OrdersUnitTest` | Order service unit tests |
+| `OrderIntegrationTest` | Order API integration tests |
+| `UserUnitTest` | User service unit tests |
+| `UserIntegrationTest` | User API integration tests |
 
 ---
 
@@ -478,6 +621,7 @@ Test projects cover:
 | `/add-product` | AddProductComponent | No |
 | `/edit-product/:id` | EditProductComponent | No |
 | `/ai-guide` | AiGuideComponent | No |
+| `/valuation` | ValuationComponent | No |
 | `/blog` | BlogComponent | No |
 | `/contact` | ContactComponent | No |
 | `/admin` | AdminDashboardComponent | ✅ Admin only |

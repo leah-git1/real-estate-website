@@ -1,0 +1,113 @@
+================================================================================
+  FULL-STACK DEPENDENCY REPORT
+  Project: Real Estate Website
+  Generated from: ai_service/, backend/, frontend/
+================================================================================
+
+
+[Python Dependencies]
+  Source: ai_service/requirements.txt & ai_service/chat_service.py
+  Runtime: Python 3.11+
+--------------------------------------------------------------------------------
+  fastapi>=0.111.0               # API framework, routing, UploadFile, Form
+  uvicorn>=0.30.0                # ASGI server
+  openai>=1.30.0                 # GPT-4o / GPT-4o-mini API client
+  python-dotenv>=1.0.0           # .env API key loading
+  pydantic>=2.7.0                # Request/response data models
+  python-multipart>=0.0.9        # Multipart form & file upload support
+
+  [Dev / Test]
+  pytest>=8.2.0                  # Test runner
+  httpx>=0.27.0                  # FastAPI TestClient transport
+
+
+[C# Dependencies]
+  Source: backend/**/*.csproj
+  Runtime: .NET 8.0
+--------------------------------------------------------------------------------
+  [WebApiShop — Main API]
+  MailKit                        4.15.0    # Email sending (SMTP)
+  NLog.MailKit                   6.0.5     # NLog email target
+  NLog.Web.AspNetCore            6.1.0     # Structured logging for ASP.NET Core
+
+  [AI_SERVICE — AI Class Library]
+  Microsoft.Extensions.Configuration.Abstractions  8.0.0   # Configuration abstractions
+  Microsoft.Extensions.Http                        8.0.0   # HttpClient factory
+
+  [Repository — Data Access Layer]
+  MailKit                        4.15.0    # Email sending
+  Microsoft.AspNetCore.OpenApi   8.0.22    # OpenAPI/Swagger support
+  Microsoft.EntityFrameworkCore.SqlServer  8.0.24  # EF Core SQL Server provider
+  NLog.MailKit                   6.0.5     # NLog email target
+  NLog.Web.AspNetCore            6.1.0     # Logging
+  Swashbuckle.AspNetCore         8.1.4     # Swagger UI
+
+  [Services — Business Logic Layer]
+  AutoMapper.Extensions.Microsoft.DependencyInjection  12.0.1  # DTO mapping + DI
+  MailKit                        4.15.0    # Email sending
+  NLog.MailKit                   6.0.5     # NLog email target
+  NLog.Web.AspNetCore            6.1.0     # Logging
+  zxcvbn-core                    7.0.92    # Password strength validation
+
+  [TestProject — Integration & Unit Tests]
+  coverlet.collector             6.0.0     # Code coverage
+  Microsoft.EntityFrameworkCore.InMemory   8.0.24  # In-memory DB for tests
+  Microsoft.EntityFrameworkCore.SqlServer  8.0.24  # EF Core SQL Server
+  Microsoft.NET.Test.Sdk         17.8.0    # Test SDK
+  Moq                            4.20.72   # Mocking framework
+  Moq.EntityFrameworkCore        8.0.1.7   # EF Core mocking extensions
+  xunit                          2.5.3     # Test framework
+  xunit.runner.visualstudio      2.5.3     # VS test runner integration
+
+
+[Angular/Frontend Dependencies]
+  Source: frontend/package.json
+  Runtime: Node.js 20+, npm 11.8.0
+--------------------------------------------------------------------------------
+  [Production Dependencies]
+  @angular/animations            ^21.1.5   # Angular animations
+  @angular/cdk                   ^21.1.5   # Angular Component Dev Kit
+  @angular/common                ^21.1.0   # Angular common utilities
+  @angular/compiler              ^21.1.0   # Angular template compiler
+  @angular/core                  ^21.1.0   # Angular core framework
+  @angular/forms                 ^21.1.0   # Reactive & template-driven forms
+  @angular/platform-browser      ^21.1.0   # Browser platform
+  @angular/platform-browser-dynamic  ^21.1.5  # JIT compilation support
+  @angular/router                ^21.1.0   # Client-side routing
+  @primeng/themes                ^21.0.4   # PrimeNG theme engine
+  @primeuix/themes               ^2.0.3    # PrimeUIX themes
+  chart.js                       ^4.5.1    # Charts (admin dashboard)
+  primeflex                      ^4.0.0    # CSS utility layout
+  primeicons                     ^7.0.0    # Icon library
+  primeng                        ^21.1.1   # UI component library
+  rxjs                           ~7.8.0    # Reactive programming
+  tslib                          ^2.3.0    # TypeScript runtime helpers
+  zone.js                        ^0.16.1   # Angular change detection
+
+  [Dev Dependencies]
+  @angular-devkit/build-angular  ^21.1.4   # Angular build toolchain
+  @angular/build                 ^21.1.4   # Angular build support
+  @angular/cli                   ^21.1.4   # Angular CLI
+  @angular/compiler-cli          ^21.1.0   # AOT compiler CLI
+  jsdom                          ^27.1.0   # DOM emulation for tests
+  typescript                     ~5.9.2    # TypeScript compiler
+  vitest                         ^4.0.8    # Unit test runner
+
+
+================================================================================
+  INSTALL INSTRUCTIONS
+================================================================================
+
+  # Python AI Service
+  cd ai_service
+  pip install -r requirements.txt
+
+  # .NET Backend
+  cd backend/WebApiShop
+  dotnet restore
+
+  # Angular Frontend
+  cd frontend
+  npm install
+
+================================================================================

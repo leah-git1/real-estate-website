@@ -130,7 +130,7 @@ timeout /t 3 /nobreak >nul
 
 :: ── Start .NET Backend (IIS Express port 44305) ───────────────────────────────
 echo  ⚙️   Starting .NET Backend on https://localhost:44305 ...
-start "⚙️ Backend — .NET 8 (port 44305)" cmd /k "color 0E && title Backend ^(.NET 8^) && cd /d "%BACKEND_DIR%" && echo. && echo  Backend starting... && echo  Swagger UI: https://localhost:44305/swagger && echo. && dotnet run --launch-profile IIS Express"
+start "Backend — .NET 8 (port 44305)" cmd /k "color 0E && title Backend (.NET 8) && cd /d "%BACKEND_DIR%" && echo. && echo  Backend starting... && echo  Swagger UI: https://localhost:44305/swagger && echo. && dotnet run"
 
 :: Give .NET a moment to compile and start
 timeout /t 5 /nobreak >nul
